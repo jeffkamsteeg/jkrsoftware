@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 
-/** Solo la última palabra se anima; el resto del titular es fijo. */
+const STATIC_HEADLINE = "Software, páginas web y aplicaciones ";
 const WORDS = [
   "rápidas",
   "seguras",
@@ -24,8 +25,6 @@ const BETWEEN_WORDS_MS = 120;
 
 export function HeroTypewriterHeadline() {
   const [displayWord, setDisplayWord] = useState("");
-  /** null = aún no leímos prefers-reduced-motion en el cliente */
-  const [respectMotion, setRespectMotion] = useState<boolean | null>(null);
   const timeoutIds = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   const clearTimers = () => {
@@ -38,24 +37,13 @@ export function HeroTypewriterHeadline() {
     timeoutIds.current.push(id);
   };
 
-  useLayoutEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const read = () => setRespectMotion(mq.matches);
-    read();
-    mq.addEventListener("change", read);
-    return () => mq.removeEventListener("change", read);
-  }, []);
+  const setWordVisible = (w: string) => {
+    flushSync(() => {
+      setDisplayWord(w);
+    });
+  };
 
   useEffect(() => {
-    clearTimers();
-
-    if (respectMotion === null) return;
-
-    if (respectMotion) {
-      setDisplayWord(WORDS[0]);
-      return;
-    }
-
     let cancelled = false;
 
     const runWord = (wordIndex: number) => {
@@ -64,7 +52,7 @@ export function HeroTypewriterHeadline() {
 
       const typeChar = (i: number) => {
         if (cancelled) return;
-        setDisplayWord(word.slice(0, i));
+        setWordVisible(word.slice(0, i));
         if (i < word.length) {
           schedule(() => typeChar(i + 1), TYPING_MS);
         } else {
@@ -74,7 +62,7 @@ export function HeroTypewriterHeadline() {
 
       const deleteChar = (len: number) => {
         if (cancelled) return;
-        setDisplayWord(word.slice(0, len));
+        setWordVisible(word.slice(0, len));
         if (len > 0) {
           schedule(() => deleteChar(len - 1), DELETING_MS);
         } else {
@@ -94,9 +82,7 @@ export function HeroTypewriterHeadline() {
       cancelled = true;
       clearTimers();
     };
-  }, [respectMotion]);
-
-  const showCursor = respectMotion === false;
+  }, []);
 
   return (
     <>
@@ -106,17 +92,12 @@ export function HeroTypewriterHeadline() {
         innovadoras y confiables.
       </span>
       <span aria-hidden className="text-balance">
-        <span className="text-ink">
-          <span className="font-semibold text-brand-primary">Software</span>
-          {", páginas web y aplicaciones "}
-        </span>
+        <span className="text-ink">{STATIC_HEADLINE}</span>
         <span className="text-brand-primary">{displayWord}</span>
-        {showCursor ? (
-          <span
-            className="hero-typewriter-cursor ml-0.5 inline-block h-[0.85em] w-[3px] translate-y-[0.08em] bg-brand-primary align-middle sm:ml-1"
-            aria-hidden
-          />
-        ) : null}
+        <span
+          className="hero-typewriter-cursor ml-0.5 inline-block h-[0.85em] w-[3px] translate-y-[0.08em] bg-brand-primary align-middle sm:ml-1"
+          aria-hidden
+        />
       </span>
     </>
   );
