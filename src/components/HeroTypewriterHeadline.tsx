@@ -12,7 +12,6 @@ const WORDS = [
   "eficientes",
   "robustas",
   "intuitivas",
-  "personalizadas",
   "innovadoras",
   "confiables",
 ] as const;
@@ -88,8 +87,8 @@ export function HeroTypewriterHeadline() {
     <>
       <span className="sr-only">
         Software, páginas web y aplicaciones rápidas, seguras, modernas,
-        escalables, eficientes, robustas, intuitivas, personalizadas,
-        innovadoras y confiables.
+        escalables, eficientes, robustas, intuitivas, innovadoras y
+        confiables.
       </span>
       <span aria-hidden className="text-balance">
         <span className="text-ink">{STATIC_HEADLINE}</span>

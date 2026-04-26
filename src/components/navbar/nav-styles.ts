@@ -14,7 +14,7 @@ export const logoLinkClassName =
   "relative z-20 flex min-w-0 max-w-[72%] shrink items-center outline-none focus-visible:ring-2 focus-visible:ring-brand-accent/50 focus-visible:ring-offset-2 focus-visible:ring-offset-white sm:max-w-none";
 
 export const logoImageClassName =
-  "h-20 max-w-[min(100%,calc(100vw-3.75rem))] w-auto object-contain object-left drop-shadow-[0_2px_8px_rgb(37_99_235/0.12)] sm:max-w-none sm:h-[8.75rem] md:h-[10rem] lg:h-[11.5rem] xl:h-[12.5rem] 2xl:h-[13.5rem]";
+  "h-28 max-w-[min(100%,calc(100vw-3.75rem))] w-auto object-contain object-left drop-shadow-[0_2px_8px_rgb(37_99_235/0.12)] sm:max-w-none sm:h-[8.75rem] md:h-[10rem] lg:h-[11.5rem] xl:h-[12.5rem] 2xl:h-[13.5rem]";
 
 export const desktopListClassName =
   "hidden min-w-0 items-center justify-end gap-1.5 md:flex md:gap-4 lg:gap-6";
