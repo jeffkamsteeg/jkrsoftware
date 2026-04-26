@@ -2,8 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
-/** Texto fijo desde la primera pintura; solo la última palabra se anima. */
-const STATIC_HEADLINE = "Software, páginas web y aplicaciones ";
+/** Solo la última palabra se anima; el resto del titular es fijo. */
 const WORDS = [
   "rápidas",
   "seguras",
@@ -107,7 +106,10 @@ export function HeroTypewriterHeadline() {
         innovadoras y confiables.
       </span>
       <span aria-hidden className="text-balance">
-        <span className="text-ink">{STATIC_HEADLINE}</span>
+        <span className="text-ink">
+          <span className="font-semibold text-brand-primary">Software</span>
+          {", páginas web y aplicaciones "}
+        </span>
         <span className="text-brand-primary">{displayWord}</span>
         {showCursor ? (
           <span
