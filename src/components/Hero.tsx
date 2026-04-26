@@ -3,7 +3,7 @@ import { HeroTypewriterHeadline } from "@/components/HeroTypewriterHeadline";
 
 export default function Hero() {
   return (
-    <section className="flex min-h-dvh min-h-screen items-center justify-center bg-gray-50 px-4 py-12 sm:px-6 sm:py-16">
+    <section className="flex min-h-dvh min-h-screen items-center justify-center bg-gray-50 px-4 py-8 sm:px-6 sm:py-16 max-md:pt-6">
       <div className="w-full max-w-2xl text-center">
         <h1 className="text-3xl font-bold tracking-tight text-ink sm:text-4xl md:text-5xl">
           <HeroTypewriterHeadline />

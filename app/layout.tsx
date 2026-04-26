@@ -21,7 +21,7 @@ export default function RootLayout({
 
         <Navbar />
 
-        <main className="min-w-0 flex-grow">
+        <main className="min-w-0 flex-grow max-md:-mt-2 md:mt-0">
           {children}
         </main>
 
