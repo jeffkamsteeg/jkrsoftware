@@ -78,11 +78,3 @@ body {
   transform-origin: center;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .wa-whatsapp-pop-in {
-    animation: none;
-    opacity: 1;
-    transform: none;
-  }
-}
-

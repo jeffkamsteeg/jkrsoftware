@@ -10,11 +10,6 @@ const PULSE_STAGGER_MS = 1100;
 const PULSE_MAX_SCALE = 2.6;
 const PULSE_OPACITY_PEAK = 0.88;
 
-function readReduceMotion(): boolean {
-  if (typeof window === "undefined") return false;
-  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
-
 function easeOutPow(t: number): number {
   return 1 - (1 - t) ** 2.5;
 }
@@ -35,7 +30,6 @@ function pulseAt(elapsedMs: number, offsetMs: number) {
  */
 export function WhatsAppFloatingButton() {
   const [visible, setVisible] = useState(false);
-  const [reduceMotion, setReduceMotion] = useState(readReduceMotion);
 
   const ring1Ref = useRef<HTMLSpanElement>(null);
   const ring2Ref = useRef<HTMLSpanElement>(null);
@@ -48,17 +42,7 @@ export function WhatsAppFloatingButton() {
   }, []);
 
   useEffect(() => {
-    const mqR = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const sync = () => setReduceMotion(mqR.matches);
-    sync();
-    mqR.addEventListener("change", sync);
-    return () => mqR.removeEventListener("change", sync);
-  }, []);
-
-  const runPulse = visible && !reduceMotion;
-
-  useEffect(() => {
-    if (!runPulse) {
+    if (!visible) {
       if (rafRef.current !== null) {
         cancelAnimationFrame(rafRef.current);
         rafRef.current = null;
@@ -108,7 +92,7 @@ export function WhatsAppFloatingButton() {
       rafRef.current = null;
       startRef.current = null;
     };
-  }, [runPulse]);
+  }, [visible]);
 
   if (!visible || typeof document === "undefined") {
     return null;
@@ -117,16 +101,7 @@ export function WhatsAppFloatingButton() {
   const ringBase =
     "wa-whatsapp-pulse-blob pointer-events-none absolute inset-0 z-0 rounded-full";
 
-  const reducedStyle = reduceMotion
-    ? ({
-        transform: "scale(1.4)",
-        opacity: 0.5,
-        transformOrigin: "center",
-      } as const)
-    : undefined;
-
-  const pulseOrigin =
-    !reduceMotion ? ({ transformOrigin: "center" } as const) : undefined;
+  const pulseOrigin = { transformOrigin: "center" } as const;
 
   return createPortal(
     <div
@@ -137,13 +112,13 @@ export function WhatsAppFloatingButton() {
         <span
           ref={ring1Ref}
           className={ringBase}
-          style={reducedStyle ?? pulseOrigin}
+          style={pulseOrigin}
           aria-hidden
         />
         <span
           ref={ring2Ref}
-          className={reduceMotion ? `${ringBase} hidden` : ringBase}
-          style={reduceMotion ? undefined : pulseOrigin}
+          className={ringBase}
+          style={pulseOrigin}
           aria-hidden
         />
         <a
