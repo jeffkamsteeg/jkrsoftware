@@ -58,3 +58,67 @@ body {
   }
 }
 
+/* WhatsApp flotante: entrada suave + ondas verdes (tipo “disponible en chat”) */
+@keyframes wa-whatsapp-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Halo que crece y se desvanece; mucho más visible que solo un borde */
+@keyframes wa-whatsapp-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.95;
+    box-shadow: 0 0 0 0 rgb(37 211 102 / 0.9);
+  }
+  45% {
+    opacity: 0.55;
+    box-shadow: 0 0 0 10px rgb(37 211 102 / 0.5);
+  }
+  100% {
+    transform: scale(2.35);
+    opacity: 0;
+    box-shadow: 0 0 0 22px rgb(37 211 102 / 0);
+  }
+}
+
+/*
+ * `both`: aplica el estado del primer keyframe antes de empezar (evita el flash a tamaño completo).
+ */
+.wa-whatsapp-pop-in {
+  animation: wa-whatsapp-enter 1.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: center;
+}
+
+.wa-whatsapp-pulse {
+  will-change: transform, opacity, box-shadow;
+  animation: wa-whatsapp-ping 2.2s ease-out infinite;
+  transform-origin: center;
+}
+
+.wa-whatsapp-pulse--delay {
+  animation-delay: 1.1s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wa-whatsapp-pop-in {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  .wa-whatsapp-pulse,
+  .wa-whatsapp-pulse--delay {
+    animation: none;
+    opacity: 0;
+    box-shadow: none;
+    visibility: hidden;
+  }
+}
+

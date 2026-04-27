@@ -10,23 +10,16 @@ export default function Hero() {
         </h1>
 
         <p className="mt-5 text-base leading-relaxed text-gray-600 sm:mt-6 sm:text-lg">
-          Usamos <span className="font-medium text-ink">inteligencia artificial</span>{" "}
-          para acelerar el ciclo de vida del software: menos tiempo de
-          desarrollo, menos fricción y entregas más predecibles. El resultado
-          son productos con foco en{" "}
-          <span className="font-medium text-ink">
-            seguridad, fiabilidad, rendimiento
-          </span>{" "}
-          y la disponibilidad que tu negocio necesita, incluso fuera del horario
-          habitual.
+          Desarrollamos software y páginas web rápidas, seguras y optimizadas
+          para generar más clientes.
         </p>
 
         <div className="mt-8 flex w-full flex-col gap-3 sm:mx-auto sm:w-auto sm:flex-row sm:justify-center sm:gap-4">
           <Link
             href="/contacto"
-            className="inline-flex min-h-11 items-center justify-center rounded-xl bg-black px-6 py-3 text-center text-sm font-medium text-white transition hover:bg-gray-800 sm:min-h-12 sm:text-base"
+            className="inline-flex min-h-9 items-center justify-center rounded-lg bg-black px-4 py-2 text-center text-xs font-medium text-white transition hover:bg-gray-800 sm:min-h-10 sm:px-5 sm:py-2.5 sm:text-sm"
           >
-            Contáctame
+            Impulsa tu negocio ahora
           </Link>
 
           <Link
