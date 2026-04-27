@@ -1,22 +1,156 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { WHATSAPP_URL } from "@/config/contact";
 
 const SHOW_AFTER_MS = 5000;
+const PULSE_MS = 2200;
+const PULSE_STAGGER_MS = 1100;
+const PULSE_MAX_SCALE = 2.6;
+const PULSE_OPACITY_PEAK = 0.88;
+
+function readTouchLike(): boolean {
+  if (typeof window === "undefined") return false;
+  return (
+    window.matchMedia("(pointer: coarse)").matches ||
+    window.matchMedia("(max-width: 767px)").matches
+  );
+}
+
+function readReduceMotion(): boolean {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+function easeOutPow(t: number): number {
+  return 1 - (1 - t) ** 2.5;
+}
+
+function pulseAt(elapsedMs: number, offsetMs: number) {
+  const t = (((elapsedMs - offsetMs) % PULSE_MS) + PULSE_MS) % PULSE_MS;
+  const u = t / PULSE_MS;
+  const e = easeOutPow(u);
+  const scale = 1 + (PULSE_MAX_SCALE - 1) * e;
+  const opacity = PULSE_OPACITY_PEAK * (1 - e);
+  return { scale, opacity };
+}
 
 export function WhatsAppFloatingButton() {
   const [visible, setVisible] = useState(false);
+  const [touchLike, setTouchLike] = useState(readTouchLike);
+  const [reduceMotion, setReduceMotion] = useState(readReduceMotion);
+
+  const ring1Ref = useRef<HTMLSpanElement>(null);
+  const ring2Ref = useRef<HTMLSpanElement>(null);
+  const rafRef = useRef<number | null>(null);
+  const startRef = useRef<number | null>(null);
 
   useEffect(() => {
     const id = window.setTimeout(() => setVisible(true), SHOW_AFTER_MS);
     return () => window.clearTimeout(id);
   }, []);
 
+  useEffect(() => {
+    const mqR = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const mqT = window.matchMedia("(pointer: coarse)");
+    const mqN = window.matchMedia("(max-width: 767px)");
+    const sync = () => {
+      setReduceMotion(mqR.matches);
+      setTouchLike(mqT.matches || mqN.matches);
+    };
+    sync();
+    mqR.addEventListener("change", sync);
+    mqT.addEventListener("change", sync);
+    mqN.addEventListener("change", sync);
+    return () => {
+      mqR.removeEventListener("change", sync);
+      mqT.removeEventListener("change", sync);
+      mqN.removeEventListener("change", sync);
+    };
+  }, []);
+
+  const useJsPulse = touchLike && !reduceMotion;
+
+  useEffect(() => {
+    if (!visible || !useJsPulse) {
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+      startRef.current = null;
+      const a = ring1Ref.current;
+      const b = ring2Ref.current;
+      if (a) {
+        a.style.removeProperty("transform");
+        a.style.removeProperty("opacity");
+      }
+      if (b) {
+        b.style.removeProperty("transform");
+        b.style.removeProperty("opacity");
+      }
+      return;
+    }
+
+    const tick = (now: number) => {
+      if (startRef.current === null) startRef.current = now;
+      const elapsed = now - startRef.current;
+
+      const p1 = pulseAt(elapsed, 0);
+      const p2 = pulseAt(elapsed, PULSE_STAGGER_MS);
+
+      const r1 = ring1Ref.current;
+      const r2 = ring2Ref.current;
+      if (r1) {
+        r1.style.transform = `scale(${p1.scale})`;
+        r1.style.opacity = String(p1.opacity);
+      }
+      if (r2) {
+        r2.style.transform = `scale(${p2.scale})`;
+        r2.style.opacity = String(p2.opacity);
+      }
+
+      rafRef.current = requestAnimationFrame(tick);
+    };
+
+    rafRef.current = requestAnimationFrame(tick);
+    return () => {
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+      startRef.current = null;
+    };
+  }, [visible, useJsPulse]);
+
   if (!visible || typeof document === "undefined") {
     return null;
   }
+
+  const ringBase =
+    "wa-whatsapp-pulse-blob pointer-events-none absolute inset-0 z-0 rounded-full";
+
+  const ring1Class =
+    useJsPulse || (touchLike && reduceMotion)
+      ? ringBase
+      : `${ringBase} wa-whatsapp-pulse`;
+
+  const ring2Class =
+    touchLike && reduceMotion
+      ? `${ringBase} hidden`
+      : useJsPulse
+        ? ringBase
+        : `${ringBase} wa-whatsapp-pulse wa-whatsapp-pulse--delay`;
+
+  const staticReduced =
+    touchLike && reduceMotion
+      ? ({
+          transform: "scale(1.4)",
+          opacity: 0.5,
+          transformOrigin: "center",
+        } as const)
+      : undefined;
+
+  const jsOrigin =
+    useJsPulse ? ({ transformOrigin: "center" } as const) : undefined;
 
   return createPortal(
     <div
@@ -25,11 +159,15 @@ export function WhatsAppFloatingButton() {
     >
       <div className="relative h-11 w-11 sm:h-12 sm:w-12">
         <span
-          className="wa-whatsapp-pulse wa-whatsapp-pulse-blob pointer-events-none absolute inset-0 z-0 rounded-full"
+          ref={ring1Ref}
+          className={ring1Class}
+          style={staticReduced ?? jsOrigin}
           aria-hidden
         />
         <span
-          className="wa-whatsapp-pulse wa-whatsapp-pulse--delay wa-whatsapp-pulse-blob pointer-events-none absolute inset-0 z-0 rounded-full"
+          ref={ring2Ref}
+          className={ring2Class}
+          style={useJsPulse ? jsOrigin : undefined}
           aria-hidden
         />
         <a
