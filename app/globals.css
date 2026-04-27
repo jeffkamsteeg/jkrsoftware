@@ -54,34 +54,34 @@ body {
   }
 }
 
-/* WhatsApp flotante: entrada suave + ondas verdes (tipo “disponible en chat”) */
+/* WhatsApp flotante: entrada suave + ondas (solo transform/opacity: mejor soporte iOS que box-shadow) */
 @keyframes wa-whatsapp-enter {
   from {
     opacity: 0;
-    transform: scale(0.5) translate3d(0, 0, 0);
+    transform: scale(0.5);
   }
   to {
     opacity: 1;
-    transform: scale(1) translate3d(0, 0, 0);
+    transform: scale(1);
   }
 }
 
-/* Halo que crece y se desvanece; mucho más visible que solo un borde */
 @keyframes wa-whatsapp-ping {
   0% {
-    transform: scale(1) translate3d(0, 0, 0);
-    opacity: 0.95;
-    box-shadow: 0 0 0 0 rgb(37 211 102 / 0.9);
+    transform: scale(1);
+    opacity: 0.88;
   }
-  45% {
-    opacity: 0.55;
-    box-shadow: 0 0 0 10px rgb(37 211 102 / 0.5);
+  55% {
+    opacity: 0.35;
   }
   100% {
-    transform: scale(2.35) translate3d(0, 0, 0);
+    transform: scale(2.6);
     opacity: 0;
-    box-shadow: 0 0 0 22px rgb(37 211 102 / 0);
   }
+}
+
+.wa-whatsapp-pulse-blob {
+  background-color: rgba(37, 211, 102, 0.58);
 }
 
 /*
@@ -90,21 +90,16 @@ body {
 .wa-whatsapp-pop-in {
   animation: wa-whatsapp-enter 1.35s cubic-bezier(0.22, 1, 0.36, 1) both;
   transform-origin: center;
-  -webkit-transform: translateZ(0);
-  transform: translateZ(0);
 }
 
 .wa-whatsapp-pulse {
-  will-change: transform, opacity, box-shadow;
+  -webkit-animation: wa-whatsapp-ping 2.2s ease-out infinite;
   animation: wa-whatsapp-ping 2.2s ease-out infinite;
   transform-origin: center;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  -webkit-transform: translateZ(0);
-  transform: translateZ(0);
 }
 
 .wa-whatsapp-pulse--delay {
+  -webkit-animation-delay: 1.1s;
   animation-delay: 1.1s;
 }
 
@@ -115,12 +110,16 @@ body {
     transform: none;
   }
 
-  .wa-whatsapp-pulse,
-  .wa-whatsapp-pulse--delay {
+  /* Con “reducir movimiento”: halo estático visible (antes estaba oculto y parecía roto en móvil). */
+  .wa-whatsapp-pulse {
+    -webkit-animation: none;
     animation: none;
-    opacity: 0;
-    box-shadow: none;
-    visibility: hidden;
+    opacity: 0.5;
+    transform: scale(1.4);
+  }
+
+  .wa-whatsapp-pulse--delay {
+    display: none;
   }
 }
 

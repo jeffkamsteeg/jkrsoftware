@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { WHATSAPP_URL } from "@/config/contact";
 
 const SHOW_AFTER_MS = 5000;
@@ -13,22 +14,22 @@ export function WhatsAppFloatingButton() {
     return () => window.clearTimeout(id);
   }, []);
 
-  if (!visible) {
+  if (!visible || typeof document === "undefined") {
     return null;
   }
 
-  return (
+  return createPortal(
     <div
-      className="pointer-events-none fixed bottom-[max(1rem,env(safe-area-inset-bottom,0px))] right-[max(1rem,env(safe-area-inset-right,0px))] z-[100] overflow-visible sm:bottom-[max(1.25rem,env(safe-area-inset-bottom,0px))] sm:right-[max(1.25rem,env(safe-area-inset-right,0px))]"
+      className="pointer-events-none fixed bottom-[max(1rem,env(safe-area-inset-bottom,0px))] right-[max(1rem,env(safe-area-inset-right,0px))] z-[9999] sm:bottom-[max(1.25rem,env(safe-area-inset-bottom,0px))] sm:right-[max(1.25rem,env(safe-area-inset-right,0px))]"
       role="presentation"
     >
-      <div className="relative isolate h-11 w-11 overflow-visible sm:h-12 sm:w-12">
+      <div className="relative h-11 w-11 sm:h-12 sm:w-12">
         <span
-          className="wa-whatsapp-pulse pointer-events-none absolute inset-0 z-0 rounded-full bg-[#25D366]/65"
+          className="wa-whatsapp-pulse wa-whatsapp-pulse-blob pointer-events-none absolute inset-0 z-0 rounded-full"
           aria-hidden
         />
         <span
-          className="wa-whatsapp-pulse wa-whatsapp-pulse--delay pointer-events-none absolute inset-0 z-0 rounded-full bg-[#25D366]/65"
+          className="wa-whatsapp-pulse wa-whatsapp-pulse--delay wa-whatsapp-pulse-blob pointer-events-none absolute inset-0 z-0 rounded-full"
           aria-hidden
         />
         <a
@@ -50,6 +51,7 @@ export function WhatsAppFloatingButton() {
           </svg>
         </a>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
