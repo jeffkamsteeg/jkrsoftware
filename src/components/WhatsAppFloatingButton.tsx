@@ -10,14 +10,6 @@ const PULSE_STAGGER_MS = 1100;
 const PULSE_MAX_SCALE = 2.6;
 const PULSE_OPACITY_PEAK = 0.88;
 
-function readTouchLike(): boolean {
-  if (typeof window === "undefined") return false;
-  return (
-    window.matchMedia("(pointer: coarse)").matches ||
-    window.matchMedia("(max-width: 767px)").matches
-  );
-}
-
 function readReduceMotion(): boolean {
   if (typeof window === "undefined") return false;
   return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -36,9 +28,13 @@ function pulseAt(elapsedMs: number, offsetMs: number) {
   return { scale, opacity };
 }
 
+/**
+ * Onda expansiva siempre vía requestAnimationFrame (mismo código en móvil, escritorio y
+ * vista “responsive” del DevTools). Las media queries (pointer: coarse) en emulación
+ * suelen seguir siendo “ratón”, por eso antes no se veía el pulso.
+ */
 export function WhatsAppFloatingButton() {
   const [visible, setVisible] = useState(false);
-  const [touchLike, setTouchLike] = useState(readTouchLike);
   const [reduceMotion, setReduceMotion] = useState(readReduceMotion);
 
   const ring1Ref = useRef<HTMLSpanElement>(null);
@@ -53,27 +49,16 @@ export function WhatsAppFloatingButton() {
 
   useEffect(() => {
     const mqR = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const mqT = window.matchMedia("(pointer: coarse)");
-    const mqN = window.matchMedia("(max-width: 767px)");
-    const sync = () => {
-      setReduceMotion(mqR.matches);
-      setTouchLike(mqT.matches || mqN.matches);
-    };
+    const sync = () => setReduceMotion(mqR.matches);
     sync();
     mqR.addEventListener("change", sync);
-    mqT.addEventListener("change", sync);
-    mqN.addEventListener("change", sync);
-    return () => {
-      mqR.removeEventListener("change", sync);
-      mqT.removeEventListener("change", sync);
-      mqN.removeEventListener("change", sync);
-    };
+    return () => mqR.removeEventListener("change", sync);
   }, []);
 
-  const useJsPulse = touchLike && !reduceMotion;
+  const runPulse = visible && !reduceMotion;
 
   useEffect(() => {
-    if (!visible || !useJsPulse) {
+    if (!runPulse) {
       if (rafRef.current !== null) {
         cancelAnimationFrame(rafRef.current);
         rafRef.current = null;
@@ -93,6 +78,10 @@ export function WhatsAppFloatingButton() {
     }
 
     const tick = (now: number) => {
+      if (document.visibilityState === "hidden") {
+        rafRef.current = requestAnimationFrame(tick);
+        return;
+      }
       if (startRef.current === null) startRef.current = now;
       const elapsed = now - startRef.current;
 
@@ -119,7 +108,7 @@ export function WhatsAppFloatingButton() {
       rafRef.current = null;
       startRef.current = null;
     };
-  }, [visible, useJsPulse]);
+  }, [runPulse]);
 
   if (!visible || typeof document === "undefined") {
     return null;
@@ -128,29 +117,16 @@ export function WhatsAppFloatingButton() {
   const ringBase =
     "wa-whatsapp-pulse-blob pointer-events-none absolute inset-0 z-0 rounded-full";
 
-  const ring1Class =
-    useJsPulse || (touchLike && reduceMotion)
-      ? ringBase
-      : `${ringBase} wa-whatsapp-pulse`;
+  const reducedStyle = reduceMotion
+    ? ({
+        transform: "scale(1.4)",
+        opacity: 0.5,
+        transformOrigin: "center",
+      } as const)
+    : undefined;
 
-  const ring2Class =
-    touchLike && reduceMotion
-      ? `${ringBase} hidden`
-      : useJsPulse
-        ? ringBase
-        : `${ringBase} wa-whatsapp-pulse wa-whatsapp-pulse--delay`;
-
-  const staticReduced =
-    touchLike && reduceMotion
-      ? ({
-          transform: "scale(1.4)",
-          opacity: 0.5,
-          transformOrigin: "center",
-        } as const)
-      : undefined;
-
-  const jsOrigin =
-    useJsPulse ? ({ transformOrigin: "center" } as const) : undefined;
+  const pulseOrigin =
+    !reduceMotion ? ({ transformOrigin: "center" } as const) : undefined;
 
   return createPortal(
     <div
@@ -160,14 +136,14 @@ export function WhatsAppFloatingButton() {
       <div className="relative h-11 w-11 sm:h-12 sm:w-12">
         <span
           ref={ring1Ref}
-          className={ring1Class}
-          style={staticReduced ?? jsOrigin}
+          className={ringBase}
+          style={reducedStyle ?? pulseOrigin}
           aria-hidden
         />
         <span
           ref={ring2Ref}
-          className={ring2Class}
-          style={useJsPulse ? jsOrigin : undefined}
+          className={reduceMotion ? `${ringBase} hidden` : ringBase}
+          style={reduceMotion ? undefined : pulseOrigin}
           aria-hidden
         />
         <a
