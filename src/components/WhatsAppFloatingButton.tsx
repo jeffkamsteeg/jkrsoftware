@@ -19,10 +19,10 @@ export function WhatsAppFloatingButton() {
 
   return (
     <div
-      className="pointer-events-none fixed bottom-[max(1rem,env(safe-area-inset-bottom,0px))] right-[max(1rem,env(safe-area-inset-right,0px))] z-50 sm:bottom-[max(1.25rem,env(safe-area-inset-bottom,0px))] sm:right-[max(1.25rem,env(safe-area-inset-right,0px))]"
+      className="pointer-events-none fixed bottom-[max(1rem,env(safe-area-inset-bottom,0px))] right-[max(1rem,env(safe-area-inset-right,0px))] z-[100] overflow-visible sm:bottom-[max(1.25rem,env(safe-area-inset-bottom,0px))] sm:right-[max(1.25rem,env(safe-area-inset-right,0px))]"
       role="presentation"
     >
-      <div className="relative isolate h-11 w-11 sm:h-12 sm:w-12">
+      <div className="relative isolate h-11 w-11 overflow-visible sm:h-12 sm:w-12">
         <span
           className="wa-whatsapp-pulse pointer-events-none absolute inset-0 z-0 rounded-full bg-[#25D366]/65"
           aria-hidden

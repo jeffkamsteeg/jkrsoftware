@@ -17,18 +17,22 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es">
-      <body className="flex min-h-screen flex-col overflow-x-hidden antialiased">
+      <body className="flex min-h-screen flex-col antialiased">
+        {/*
+          overflow-x solo en el contenido: en móvil (Safari) un body con overflow-x
+          puede recortar sombras/transforms del botón fixed de WhatsApp.
+        */}
+        <div className="flex min-h-screen min-w-0 flex-1 flex-col overflow-x-hidden">
+          <Navbar />
 
-        <Navbar />
+          <main className="min-w-0 flex-grow max-md:-mt-2 md:mt-0">
+            {children}
+          </main>
 
-        <main className="min-w-0 flex-grow max-md:-mt-2 md:mt-0">
-          {children}
-        </main>
-
-        <Footer />
+          <Footer />
+        </div>
 
         <WhatsAppFloatingButton />
-
       </body>
     </html>
   );

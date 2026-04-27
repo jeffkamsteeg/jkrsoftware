@@ -30,11 +30,7 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/* Evita desplazamiento horizontal por elementos que sobresalen del viewport */
-html,
-body {
-  overflow-x: hidden;
-}
+/* overflow-x: solo en el wrapper del layout (layout.tsx), no en html/body, para que iOS no recorte el FAB. */
 
 @keyframes hero-cursor-blink {
   0%,
@@ -62,18 +58,18 @@ body {
 @keyframes wa-whatsapp-enter {
   from {
     opacity: 0;
-    transform: scale(0.5);
+    transform: scale(0.5) translate3d(0, 0, 0);
   }
   to {
     opacity: 1;
-    transform: scale(1);
+    transform: scale(1) translate3d(0, 0, 0);
   }
 }
 
 /* Halo que crece y se desvanece; mucho más visible que solo un borde */
 @keyframes wa-whatsapp-ping {
   0% {
-    transform: scale(1);
+    transform: scale(1) translate3d(0, 0, 0);
     opacity: 0.95;
     box-shadow: 0 0 0 0 rgb(37 211 102 / 0.9);
   }
@@ -82,7 +78,7 @@ body {
     box-shadow: 0 0 0 10px rgb(37 211 102 / 0.5);
   }
   100% {
-    transform: scale(2.35);
+    transform: scale(2.35) translate3d(0, 0, 0);
     opacity: 0;
     box-shadow: 0 0 0 22px rgb(37 211 102 / 0);
   }
@@ -94,12 +90,18 @@ body {
 .wa-whatsapp-pop-in {
   animation: wa-whatsapp-enter 1.35s cubic-bezier(0.22, 1, 0.36, 1) both;
   transform-origin: center;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
 }
 
 .wa-whatsapp-pulse {
   will-change: transform, opacity, box-shadow;
   animation: wa-whatsapp-ping 2.2s ease-out infinite;
   transform-origin: center;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
 }
 
 .wa-whatsapp-pulse--delay {
