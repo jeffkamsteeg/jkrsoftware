@@ -22,7 +22,14 @@ const PAUSE_FULL_MS = 2000;
 const START_MS = 450;
 const BETWEEN_WORDS_MS = 120;
 
-export function HeroTypewriterHeadline() {
+type HeroTypewriterHeadlineProps = {
+  /** Texto claro sobre fondo oscuro (p. ej. video) */
+  onDarkBackground?: boolean;
+};
+
+export function HeroTypewriterHeadline({
+  onDarkBackground = false,
+}: HeroTypewriterHeadlineProps) {
   const [displayWord, setDisplayWord] = useState("");
   const timeoutIds = useRef<ReturnType<typeof setTimeout>[]>([]);
 
@@ -91,10 +98,18 @@ export function HeroTypewriterHeadline() {
         confiables.
       </span>
       <span aria-hidden className="text-balance">
-        <span className="text-ink">{STATIC_HEADLINE}</span>
-        <span className="text-brand-primary">{displayWord}</span>
+        <span className={onDarkBackground ? "text-white" : "text-ink"}>
+          {STATIC_HEADLINE}
+        </span>
         <span
-          className="hero-typewriter-cursor ml-0.5 inline-block h-[0.85em] w-[3px] translate-y-[0.08em] bg-brand-primary align-middle sm:ml-1"
+          className={
+            onDarkBackground ? "text-sky-300" : "text-brand-primary"
+          }
+        >
+          {displayWord}
+        </span>
+        <span
+          className={`hero-typewriter-cursor ml-0.5 inline-block h-[0.85em] w-[3px] translate-y-[0.08em] align-middle sm:ml-1 ${onDarkBackground ? "bg-sky-300" : "bg-brand-primary"}`}
           aria-hidden
         />
       </span>
