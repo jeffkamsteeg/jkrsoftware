@@ -5,6 +5,7 @@ import { NAV_ITEMS } from "./nav-items";
 import { NavbarBrand } from "./NavbarBrand";
 import { NavbarLink } from "./NavbarLink";
 import { NavbarMenuButton } from "./NavbarMenuButton";
+import { AuthNav } from "@/components/auth/AuthNav";
 import {
   barRowClassName,
   desktopListClassName,
@@ -34,6 +35,8 @@ export default function Navbar() {
             ))}
           </ul>
 
+          <AuthNav variant="desktop" />
+
           <NavbarMenuButton open={open} onToggle={toggle} />
         </div>
 
@@ -51,6 +54,7 @@ export default function Navbar() {
               </li>
             ))}
           </ul>
+          <AuthNav variant="mobile" onNavigate={close} />
         </div>
       </nav>
     </header>
