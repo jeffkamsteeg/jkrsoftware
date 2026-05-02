@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { PasswordInputWithToggle } from "@/components/auth/PasswordInputWithToggle";
 
 function translateAuthError(raw: string) {
   if (raw.includes("Invalid login credentials")) {
@@ -65,22 +66,15 @@ export function LoginForm() {
         />
       </div>
 
-      <div className="space-y-1">
-        <label htmlFor="login-password" className="block text-sm font-medium text-ink">
-          Contraseña
-        </label>
-        <input
-          id="login-password"
-          name="password"
-          type="password"
-          autoComplete="current-password"
-          required
-          minLength={6}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none ring-brand-accent/40 transition focus:border-brand-primary focus:ring-2"
-        />
-      </div>
+      <PasswordInputWithToggle
+        id="login-password"
+        label="Contraseña"
+        name="password"
+        autoComplete="current-password"
+        minLength={6}
+        value={password}
+        onChange={setPassword}
+      />
 
       {error ? (
         <p className="text-sm font-medium text-red-600" role="alert">

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, type FormEvent } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { PasswordInputWithToggle } from "@/components/auth/PasswordInputWithToggle";
 
 export function SignupForm() {
   const router = useRouter();
@@ -74,23 +75,20 @@ export function SignupForm() {
         />
       </div>
 
-      <div className="space-y-1">
-        <label htmlFor="signup-password" className="block text-sm font-medium text-ink">
-          Contraseña
-        </label>
-        <input
-          id="signup-password"
-          name="password"
-          type="password"
-          autoComplete="new-password"
-          required
-          minLength={8}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none ring-brand-accent/40 transition focus:border-brand-primary focus:ring-2"
-        />
-        <p className="text-xs text-gray-500">Mínimo 8 caracteres (ajustable en Supabase).</p>
-      </div>
+      <PasswordInputWithToggle
+        id="signup-password"
+        label="Contraseña"
+        name="password"
+        autoComplete="new-password"
+        minLength={8}
+        value={password}
+        onChange={setPassword}
+        hint={
+          <p className="text-xs text-gray-500">
+            Mínimo 8 caracteres (ajustable en Supabase).
+          </p>
+        }
+      />
 
       {error ? (
         <p className="text-sm font-medium text-red-600" role="alert">
