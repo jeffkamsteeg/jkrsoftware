@@ -22,14 +22,14 @@ export default function Hero() {
 
         <div className="mt-8 flex w-full flex-col gap-3 sm:mx-auto sm:w-auto sm:flex-row sm:justify-center sm:gap-4">
           <Link
-            href="/contacto"
+            href="/#contacto"
             className="inline-flex min-h-9 items-center justify-center rounded-lg bg-white px-4 py-2 text-center text-xs font-medium text-slate-900 transition hover:bg-white/90 sm:min-h-10 sm:px-5 sm:py-2.5 sm:text-sm"
           >
             Impulsa tu negocio ahora
           </Link>
 
           <Link
-            href="/portafolio"
+            href="/#portafolio"
             className="inline-flex min-h-11 items-center justify-center rounded-xl border border-white/35 bg-white/5 px-6 py-3 text-center text-sm font-medium text-white backdrop-blur-sm transition hover:bg-white/15 sm:min-h-12 sm:text-base"
           >
             Ver trabajos

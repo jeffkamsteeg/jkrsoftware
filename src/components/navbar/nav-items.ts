@@ -1,7 +1,6 @@
 export type NavItem = {
   label: string;
   href: string;
-  /** Solo rutas internas (Inicio / Servicios); anclas del home no se marcan activas por pathname. */
   isActive: (pathname: string) => boolean;
 };
 
@@ -13,17 +12,17 @@ export const NAV_ITEMS: NavItem[] = [
   },
   {
     label: "Servicios",
-    href: "/servicios",
-    isActive: (p) => p.startsWith("/servicios"),
+    href: "/#servicios",
+    isActive: () => false,
   },
   {
     label: "Portafolio",
-    href: "/portafolio",
-    isActive: (p) => p.startsWith("/portafolio"),
+    href: "/#portafolio",
+    isActive: () => false,
   },
   {
     label: "Contacto",
-    href: "/contacto",
-    isActive: (p) => p.startsWith("/contacto"),
+    href: "/#contacto",
+    isActive: () => false,
   },
 ];
