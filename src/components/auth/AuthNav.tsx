@@ -89,6 +89,8 @@ export function AuthNav({
     );
   }
 
+  const email = user.email?.trim();
+
   return (
     <div
       className={
@@ -100,10 +102,17 @@ export function AuthNav({
       <Link
         href="/cuenta"
         onClick={onNavigate}
-        title={user.email ?? "Mi cuenta"}
-        className={`${btnBase} max-w-[180px] truncate text-ink hover:bg-black/[0.04] hover:text-brand-primary`}
+        title={email ?? "Mi cuenta"}
+        aria-label={`Ir a mi cuenta (${email ?? "usuario"})`}
+        className={`${btnBase} text-ink hover:bg-black/[0.04] hover:text-brand-primary ${
+          variant === "desktop" ? "max-w-[260px]" : "w-full justify-start text-left normal-case font-medium"
+        }`}
       >
-        Cuenta
+        <span
+          className={variant === "desktop" ? "truncate" : "break-all"}
+        >
+          {email ?? "Mi cuenta"}
+        </span>
       </Link>
       <button
         type="button"
