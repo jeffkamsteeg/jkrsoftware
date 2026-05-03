@@ -3,8 +3,14 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState, type FormEvent } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { EmailLinkExpiryCountdown } from "@/components/auth/EmailLinkExpiryCountdown";
 import { PasswordInputWithToggle } from "@/components/auth/PasswordInputWithToggle";
+import { createClient } from "@/lib/supabase/client";
+import { formatAuthEmailError } from "@/lib/auth/format-auth-email-error";
+import {
+  STORAGE_SIGNUP_LINK_SENT_AT,
+  formatExpiryDurationBrief,
+} from "@/lib/auth/email-link-validity";
 
 export function SignupForm() {
   const router = useRouter();
@@ -14,11 +20,15 @@ export function SignupForm() {
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const [confirmLinkSentAt, setConfirmLinkSentAt] = useState<number | null>(
+    null,
+  );
 
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setError(null);
     setNotice(null);
+    setConfirmLinkSentAt(null);
     setPending(true);
 
     const origin =
@@ -33,7 +43,7 @@ export function SignupForm() {
       });
 
       if (signErr) {
-        setError(signErr.message);
+        setError(formatAuthEmailError(signErr.message));
         return;
       }
 
@@ -43,6 +53,14 @@ export function SignupForm() {
           ? "Te enviamos un enlace por correo. Ábrelo para confirmar la cuenta antes de iniciar sesión."
           : "Cuenta creada correctamente.",
       );
+
+      if (needsConfirm) {
+        const t = Date.now();
+        sessionStorage.setItem(STORAGE_SIGNUP_LINK_SENT_AT, String(t));
+        setConfirmLinkSentAt(t);
+      } else {
+        setConfirmLinkSentAt(null);
+      }
 
       if (data.session) {
         router.replace("/cuenta");
@@ -59,6 +77,11 @@ export function SignupForm() {
       className="mx-auto mt-10 w-full max-w-md space-y-5 rounded-2xl border border-line bg-white p-6 shadow-sm sm:p-8"
       noValidate
     >
+      <p className="text-sm leading-relaxed text-gray-600">
+        Tras registrarte puede que debas confirmar el correo: el enlace caduca en{" "}
+        {formatExpiryDurationBrief()}; ábrelo en cuanto lo recibas (revisa spam).
+      </p>
+
       <div className="space-y-1">
         <label htmlFor="signup-email" className="block text-sm font-medium text-ink">
           Correo electrónico
@@ -97,9 +120,17 @@ export function SignupForm() {
       ) : null}
 
       {notice ? (
-        <p className="text-sm leading-relaxed text-gray-700" role="status">
-          {notice}
-        </p>
+        <div className="space-y-2 text-sm leading-relaxed">
+          <p className="text-gray-700" role="status">
+            {notice}
+          </p>
+          {confirmLinkSentAt !== null ? (
+            <EmailLinkExpiryCountdown
+              sentAt={confirmLinkSentAt}
+              className="font-medium text-gray-700"
+            />
+          ) : null}
+        </div>
       ) : null}
 
       <button

@@ -76,6 +76,15 @@ export function LoginForm() {
         onChange={setPassword}
       />
 
+      <p className="text-right text-sm">
+        <Link
+          href="/recuperar"
+          className="font-semibold text-brand-primary hover:underline"
+        >
+          ¿Olvidaste tu contraseña?
+        </Link>
+      </p>
+
       {error ? (
         <p className="text-sm font-medium text-red-600" role="alert">
           {error}

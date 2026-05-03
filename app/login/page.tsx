@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
-import { LoginAuthErrorBanner } from "@/components/auth/LoginAuthErrorBanner";
 import { LoginForm } from "@/components/auth/LoginForm";
+import { LoginQueryAlerts } from "@/components/auth/LoginQueryAlerts";
 
 export const metadata: Metadata = {
   title: "Iniciar sesión",
@@ -25,7 +25,7 @@ export default function LoginPage() {
       </div>
 
       <Suspense fallback={null}>
-        <LoginAuthErrorBanner />
+        <LoginQueryAlerts />
       </Suspense>
 
       <LoginForm />

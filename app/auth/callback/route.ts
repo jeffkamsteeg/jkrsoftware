@@ -1,6 +1,25 @@
 import { createServerClient } from "@supabase/ssr";
 import { type NextRequest, NextResponse } from "next/server";
 
+/** Rutas permitidas tras `exchangeCodeForSession` (evita redirects abiertos). */
+const ALLOWED_AFTER_AUTH = new Set<string>([
+  "/cuenta",
+  "/restablecer-contrasena",
+]);
+
+function safeNextPath(raw: string | null, fallback = "/cuenta"): string {
+  if (!raw?.trim()) return fallback;
+  let t: string;
+  try {
+    t = decodeURIComponent(raw).trim();
+  } catch {
+    return fallback;
+  }
+  if (!t.startsWith("/") || t.startsWith("//")) return fallback;
+  if (t.includes("://")) return fallback;
+  return ALLOWED_AFTER_AUTH.has(t) ? t : fallback;
+}
+
 /**
  * PKCE/email de confirmación: las cookies deben ir en el NextResponse.redirect,
  * no solo en cookieStore — si no, el intercambio “funciona” pero el navegador no guarda sesión.
@@ -13,8 +32,7 @@ export async function GET(request: NextRequest) {
 
   const origin = request.nextUrl.origin;
   const code = request.nextUrl.searchParams.get("code");
-  const nextRaw = request.nextUrl.searchParams.get("next") ?? "/cuenta";
-  const safeNext = nextRaw.startsWith("/") ? nextRaw : `/${nextRaw}`;
+  const safeNext = safeNextPath(request.nextUrl.searchParams.get("next"));
 
   const loginErrorUrl = `${origin}/login?error=auth`;
   const successUrl = `${origin}${safeNext}`;
